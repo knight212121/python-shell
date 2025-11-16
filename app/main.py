@@ -26,7 +26,7 @@ def main():
         if command[:4] == "echo":
             commands[command[:4]](command[5:])
         elif command[:4] == "exit":
-            commands[command[:4]](command[5])
+            commands[command[:4]](int(command[5]))
         elif command[:4] == "type":
             if commands[command[:4]](command[5:]):
                 print(f"{command[5:]} is a shell builtin")
