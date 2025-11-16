@@ -5,9 +5,12 @@ def main():
     while True:
         sys.stdout.write("$ ")
         command = input()
-        if command[:4] == "exit":
+        if command[:4] == "echo":
+            print(command[5:])
+        elif command[:4] == "exit":
             return int(command[5])
-        print(f"{command}: command not found")
+        else:
+            print(f"{command}: command not found")
     pass
 
 
