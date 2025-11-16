@@ -9,7 +9,7 @@ def exit_shell(code):
 
 def type_of(command):
     if command in commands:
-        print(f"{command[5:]} is a shell builtin")
+        print(f"{command} is a shell builtin")
         return
 
     path_dirs = os.environ["PATH"].split(os.pathsep)
