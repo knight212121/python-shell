@@ -15,11 +15,12 @@ def type_of(command):
     path_dirs = os.environ["PATH"].split(os.pathsep)
     # os.access("/usr/local/bin/catnap", os.X_OK)
     for path in path_dirs:
-        for executable in os.listdir(path):
-            file_path = os.path.join(path, executable)
-            if os.access(file_path, os.X_OK) and executable == command:
-                print(f"{command} is {file_path}")
-                return
+        if os.path.exists(path):
+            for executable in os.listdir(path):
+                file_path = os.path.join(path, executable)
+                if os.access(file_path, os.X_OK) and executable == command:
+                    print(f"{command} is {file_path}")
+                    return
 
     print(f"{command}: not found")
 
