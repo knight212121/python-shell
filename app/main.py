@@ -1,6 +1,5 @@
 import sys
-
-
+import os
 
 def echo(string):
     print(string)
@@ -10,8 +9,19 @@ def exit_shell(code):
 
 def type_of(command):
     if command in commands:
-        return True
-    return False
+        print(f"{command[5:]} is a shell builtin")
+        return
+
+    path_dirs = os.environ["PATH"].split(os.pathsep)
+    # os.access("/usr/local/bin/catnap", os.X_OK)
+    for path in path_dirs:
+        for executable in os.listdir(path):
+            file_path = os.path.join(path, executable)
+            if os.access(file_path, os.X_OK) and executable == command:
+                print(f"{command} is {file_path}")
+                return
+
+    print(f"{command}: not found")
 
 commands = {
     "echo": echo,
@@ -28,10 +38,7 @@ def main():
         elif command[:4] == "exit":
             commands[command[:4]](int(command[5]))
         elif command[:4] == "type":
-            if commands[command[:4]](command[5:]):
-                print(f"{command[5:]} is a shell builtin")
-            else:
-                print(f"{command[5:]}: not found")
+            commands[command[:4]](command[5:])
         else:
             print(f"{command}: command not found")
     pass
