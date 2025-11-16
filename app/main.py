@@ -45,7 +45,7 @@ def run_command(command):
                         print(line.decode("utf-8"), end="")
                     return
 
-    print(f"{command}: command not found")
+    print(f"{command[0]}: command not found")
 
 def main():
     while True:
