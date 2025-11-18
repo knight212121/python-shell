@@ -8,7 +8,7 @@ def echo(string):
 
 
 def exit_shell(code):
-    sys.exit(code)
+    sys.exit(int(code))
 
 
 def find_executable(executable):
@@ -36,16 +36,16 @@ def type_of(command):
     print(f"{command}: not found")
 
 
-def pwd():
+def pwd(_):
     print(os.getcwd())
 
 
-commands = {
-    "echo": echo,
-    "exit": exit_shell,
-    "type": type_of,
-    "pwd": pwd,
-}
+def cd(directory):
+    if directory[0] == "/":
+        if os.path.isdir(directory):
+            os.chdir(directory)
+        else:
+            print(f"cd: {directory}: No such file or directory")
 
 
 def run_command(command):
@@ -61,18 +61,34 @@ def run_command(command):
     print(f"{command[0]}: command not found")
 
 
+commands = {
+    "echo": echo,
+    "exit": exit_shell,
+    "type": type_of,
+    "pwd": pwd,
+    "cd": cd,
+}
+
+
 def main():
     while True:
         sys.stdout.write("$ ")
         command = input()
-        if command[:4] == "echo":
-            commands[command[:4]](command[5:])
-        elif command[:4] == "exit":
-            commands[command[:4]](int(command[5]))
-        elif command[:4] == "type":
-            commands[command[:4]](command[5:])
-        elif command[:3] == "pwd":
-            commands[command[:3]]()
+        # if command[:4] == "echo":
+        #     commands[command[:4]](command[5:])
+        # elif command[:4] == "exit":
+        #     commands[command[:4]](int(command[5]))
+        # elif command[:4] == "type":
+        #     commands[command[:4]](command[5:])
+        # elif command[:3] == "pwd":
+        #     commands[command[:3]]()
+        # else:
+        #     run_command(command)
+        cmd, *args = command.split(maxsplit=1)
+        handler = commands.get(cmd)
+
+        if handler:
+            handler(args[0] if args else "")
         else:
             run_command(command)
 
