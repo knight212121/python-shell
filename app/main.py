@@ -3,8 +3,49 @@ import os
 import subprocess
 
 
+def parse_echo(s):
+    in_quotes = False
+    i = 0
+    result = []
+    buf = []
+    while i < len(s):
+        c = s[i]
+        if c == "'":
+            if in_quotes:
+                in_quotes = False
+                result.append("".join(buf))
+                buf = []
+            else:
+                in_quotes = True
+            i += 1
+            continue
+
+        if in_quotes:
+            buf.append(c)
+            i += 1
+            continue
+
+        if c.isspace():
+            if buf:
+                result.append("".join(buf))
+                buf = []
+            i += 1
+            while i < len(s) and s[i].isspace():
+                i += 1
+            result.append(" ")
+            continue
+
+        buf.append(c)
+        i += 1
+
+    if buf:
+        result.append("".join(buf))
+
+    return "".join(result)
+
+
 def echo(string):
-    print(string)
+    print(parse_echo(string))
 
 
 def exit_shell(code):
