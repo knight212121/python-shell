@@ -47,7 +47,8 @@ def tokenize_string(s):
 def echo(string):
     tokens = tokenize_string(string)
     for i in tokens:
-        print(i)
+        print(i, end="")
+    print()
 
 
 def exit_shell(code):
@@ -110,7 +111,6 @@ def run_command(command):
 
 def cat(command):
     executable = find_executable("cat")
-    command = command[1:-1]
     command = ["cat", command]
     if executable:
         process = subprocess.Popen(command, stdout=subprocess.PIPE)
