@@ -106,12 +106,24 @@ def run_command(command):
     print(f"{command[0]}: command not found")
 
 
+def cat(command):
+    command = command.split(maxsize=1)
+    executable = find_executable(command[0])
+    if executable:
+        process = subprocess.Popen(command, stdout=subprocess.PIPE)
+        process.wait()
+        for line in process.stdout or []:
+            print(line.decode("utf-8"), end="")
+        return
+
+
 commands = {
     "echo": echo,
     "exit": exit_shell,
     "type": type_of,
     "pwd": pwd,
     "cd": cd,
+    "cat": cat,
 }
 
 
