@@ -3,49 +3,51 @@ import os
 import subprocess
 
 
-def parse_echo(s):
+def tokenize_string(s):
     in_quotes = False
     i = 0
     result = []
-    buf = []
+    buf = ""
     while i < len(s):
         c = s[i]
         if c == "'":
             if in_quotes:
                 in_quotes = False
-                result.append("".join(buf))
-                buf = []
+                result.append(buf)
+                buf = ""
             else:
                 in_quotes = True
             i += 1
             continue
 
         if in_quotes:
-            buf.append(c)
+            buf += c
             i += 1
             continue
 
         if c.isspace():
             if buf:
-                result.append("".join(buf))
-                buf = []
+                result.append(buf)
+                buf = ""
             i += 1
             while i < len(s) and s[i].isspace():
                 i += 1
             result.append(" ")
             continue
 
-        buf.append(c)
+        buf += c
         i += 1
 
     if buf:
-        result.append("".join(buf))
+        result.append(buf)
 
-    return "".join(result)
+    return result
 
 
 def echo(string):
-    print(parse_echo(string))
+    tokens = tokenize_string(string)
+    for i in tokens:
+        print(i)
 
 
 def exit_shell(code):
