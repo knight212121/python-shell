@@ -41,11 +41,13 @@ def pwd(_):
 
 
 def cd(directory):
-    if directory[0] == "/":
-        if os.path.isdir(directory):
-            os.chdir(directory)
-        else:
-            print(f"cd: {directory}: No such file or directory")
+    normalized = os.path.normpath(directory)
+    cwd = os.getcwd()
+    target_path = os.path.join(cwd, normalized)
+    if os.path.exists(target_path):
+        os.chdir(target_path)
+    else:
+        print(f"cd: {target_path}: No such file or directory")
 
 
 def run_command(command):
