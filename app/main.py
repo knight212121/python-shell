@@ -107,8 +107,9 @@ def run_command(command):
 
 
 def cat(command):
-    command = command.split(maxsize=1)
-    executable = find_executable(command[0])
+    command = parse_echo(command)
+    executable = find_executable("cat")
+    command = ["cat", command]
     if executable:
         process = subprocess.Popen(command, stdout=subprocess.PIPE)
         process.wait()
