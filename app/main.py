@@ -41,6 +41,8 @@ def pwd(_):
 
 
 def cd(directory):
+    if directory[0] == "~":
+        directory = directory.replace("~", os.getenv("HOME"))
     normalized = os.path.normpath(directory)
     cwd = os.getcwd()
     target_path = os.path.join(cwd, normalized)
