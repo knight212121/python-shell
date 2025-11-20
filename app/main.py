@@ -32,7 +32,6 @@ def tokenize_string(s):
             i += 1
             while i < len(s) and s[i].isspace():
                 i += 1
-            result.append(" ")
             continue
 
         buf += c
@@ -47,7 +46,7 @@ def tokenize_string(s):
 def echo(string):
     tokens = tokenize_string(string)
     for i in tokens:
-        print(i, end="")
+        print(i, end=" ")
     print()
 
 
@@ -111,7 +110,9 @@ def run_command(command):
 
 def cat(command):
     executable = find_executable("cat")
-    command = ["cat", command]
+    args = tokenize_string(command)
+    command = ["cat"]
+    command.extend(args)
     if executable:
         process = subprocess.Popen(command, stdout=subprocess.PIPE)
         process.wait()
