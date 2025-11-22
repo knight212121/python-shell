@@ -23,6 +23,8 @@ def tokenize_string(s, cmd):
                 buf = ""
             else:
                 in_single_quotes = True
+                if in_double_quotes:
+                    buf += c
             i += 1
             continue
 
