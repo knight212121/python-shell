@@ -37,8 +37,6 @@ def tokenize_string(s, cmd):
             continue
 
         if in_single_quotes or in_double_quotes:
-            if c == "'":
-                in_single_quotes = not in_single_quotes
             buf += c
             i += 1
             continue
