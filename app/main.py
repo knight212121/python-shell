@@ -11,11 +11,27 @@ def tokenize_string(s, cmd):
     buf = []
     while i < len(s):
         c = s[i]
-        if c == "\\" and not in_single_quotes:
-            if i + 1 < len(s):
-                buf.append(s[i + 1])
-                i += 2
-                continue
+        if c == "\\":
+            if in_double_quotes:
+                if i + 1 < len(s):
+                    next_char = s[i + 1]
+                    if next_char in ['"', "$", "\\", "`"]:
+                        buf.append(next_char)
+                        i += 2
+                        continue
+                    else:
+                        buf.append(c)
+                        i += 1
+                        continue
+            elif not in_double_quotes:
+                if i + 1 < len(s):
+                    buf.append(s[i + 1])
+                    i += 1
+                    continue
+
+            buf.append(c)
+            i += 1
+            continue
 
         if c == "'" and not in_double_quotes:
             in_single_quotes = not in_single_quotes
