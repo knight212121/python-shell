@@ -137,7 +137,8 @@ def run_command(command):
             if redirect_output:
                 with open(redirect_file, "w", encoding="utf-8") as f:
                     f.write(line.decode("utf-8") + "\n")
-            print(line.decode("utf-8"), end="")
+            else:
+                print(line.decode("utf-8"), end="")
         return
 
     print(f"{command[0]}: command not found")
