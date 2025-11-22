@@ -129,7 +129,6 @@ commands = {
     "type": type_of,
     "pwd": pwd,
     "cd": cd,
-    "cat": cat,
 }
 
 
