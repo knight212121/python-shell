@@ -30,7 +30,7 @@ def tokenize_string(s, cmd):
 
             if i + 1 < len(s):
                 buf.append(s[i + 1])
-                i += 1
+                i += 2
                 continue
 
         if c == "'" and not in_double_quotes:
