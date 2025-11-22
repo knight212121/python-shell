@@ -123,14 +123,19 @@ def run_command(command):
     command = tokenize_string(command)
     executable = find_executable(command[0])
     redirect_output = False
+    redicrect_file = ""
+
     if ">" in command or "1>" in command:
+        redirect_file = command[-1]
         redirect_output = True
+        command = command[:-2]
+
     if executable:
         process = subprocess.Popen(command, stdout=subprocess.PIPE)
         process.wait()
         for line in process.stdout or []:
             if redirect_output:
-                with open(command[-1], "w", encoding="utf-8") as f:
+                with open(redicrect_file, "w", encoding="utf-8") as f:
                     f.write(line.decode("utf-8") + "\n")
             print(line.decode("utf-8"), end="")
         return
