@@ -115,13 +115,12 @@ def cat(command):
     args = tokenize_string(command, "cat")
     command = ["cat"]
     command.extend(args)
-    print(command)
-    # if executable:
-    #     process = subprocess.Popen(command, stdout=subprocess.PIPE)
-    #     process.wait()
-    #     for line in process.stdout or []:
-    #         print(line.decode("utf-8"), end="")
-    #     return
+    if executable:
+        process = subprocess.Popen(command, stdout=subprocess.PIPE)
+        process.wait()
+        for line in process.stdout or []:
+            print(line.decode("utf-8"), end="")
+        return
 
 
 commands = {
