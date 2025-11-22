@@ -69,7 +69,7 @@ def find_executable(executable):
 
 
 def type_of(command):
-    if command in commands:
+    if command in shell_builtins:
         print(f"{command} is a shell builtin")
         return
 
@@ -115,12 +115,13 @@ def cat(command):
     args = tokenize_string(command, "cat")
     command = ["cat"]
     command.extend(args)
-    if executable:
-        process = subprocess.Popen(command, stdout=subprocess.PIPE)
-        process.wait()
-        for line in process.stdout or []:
-            print(line.decode("utf-8"), end="")
-        return
+    print(command)
+    # if executable:
+    #     process = subprocess.Popen(command, stdout=subprocess.PIPE)
+    #     process.wait()
+    #     for line in process.stdout or []:
+    #         print(line.decode("utf-8"), end="")
+    #     return
 
 
 commands = {
@@ -129,7 +130,10 @@ commands = {
     "type": type_of,
     "pwd": pwd,
     "cd": cd,
+    "cat": cat,
 }
+
+shell_builtins = {"echo", "exit", "type", "pwd", "cd"}
 
 
 def main():
