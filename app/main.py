@@ -3,7 +3,7 @@ import os
 import subprocess
 
 
-def tokenize_string(s, cmd="echo"):
+def tokenize_string(s, cmd="cat"):
     in_single_quotes = False
     in_double_quotes = False
     i = 0
