@@ -54,7 +54,7 @@ def echo(string):
 
 def exit_shell(code):
     if not code:
-        code = "1"
+        code = "0"
     sys.exit(int(code))
 
 
