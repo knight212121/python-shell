@@ -24,9 +24,10 @@ def tokenize_string(s, cmd):
                         i += 1
                         continue
 
-            buf.append(s[i])
-            i += 1
-            continue
+            if i + 1 < len(s):
+                buf.append(s[i + 1])
+                i += 1
+                continue
 
         if c == "'" and not in_double_quotes:
             in_single_quotes = not in_single_quotes
