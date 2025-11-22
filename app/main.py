@@ -135,8 +135,8 @@ def run_command(command):
         process.wait()
         for line in process.stdout or []:
             if redirect_output:
-                with open(redirect_file, "w", encoding="utf-8") as f:
-                    f.write(line.decode("utf-8") + "\n")
+                with open(redirect_file, "a", encoding="utf-8") as f:
+                    f.write(line.decode("utf-8"))
             else:
                 print(line.decode("utf-8"), end="")
         return
