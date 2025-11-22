@@ -11,7 +11,7 @@ def tokenize_string(s, cmd):
     buf = ""
     while i < len(s):
         c = s[i]
-        if c == "\\" and not in_single_quotes and not in_double_quotes:
+        if c == "\\" and not in_single_quotes:
             buf += s[i + 1]
             i += 2
             continue
