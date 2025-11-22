@@ -16,7 +16,7 @@ def tokenize_string(s, cmd):
             i += 2
             continue
 
-        if c == "'" and not in_double_quotes:
+        if c == "'":
             if in_single_quotes:
                 in_single_quotes = False
                 result.append(buf)
@@ -37,6 +37,10 @@ def tokenize_string(s, cmd):
             continue
 
         if in_single_quotes or in_double_quotes:
+            if c == "'":
+                in_single_quotes = not in_single_quotes
+            if c == '"':
+                in_double_quotes = not in_double_quotes
             buf += c
             i += 1
             continue
