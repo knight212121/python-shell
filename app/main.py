@@ -8,57 +8,43 @@ def tokenize_string(s, cmd):
     in_double_quotes = False
     i = 0
     result = []
-    buf = ""
+    buf = []
     while i < len(s):
         c = s[i]
         if c == "\\" and not in_single_quotes:
-            buf += s[i + 1]
-            i += 2
-            continue
+            if i + 1 < len(s):
+                buf.append(s[i + 1])
+                i += 2
+                continue
 
         if c == "'" and not in_double_quotes:
-            if in_single_quotes:
-                in_single_quotes = False
-                result.append(buf)
-                buf = ""
-            else:
-                in_single_quotes = True
-                if in_double_quotes:
-                    buf += c
+            in_single_quotes = not in_single_quotes
             i += 1
             continue
 
         if c == '"' and not in_single_quotes:
-            if in_double_quotes:
-                in_double_quotes = False
-                result.append(buf)
-                buf = ""
-            else:
-                in_double_quotes = True
+            in_double_quotes = not in_double_quotes
             i += 1
             continue
 
-        if in_single_quotes or in_double_quotes:
-            buf += c
-            i += 1
-            continue
-
-        if c.isspace():
+        if not (in_single_quotes or in_double_quotes) and c.isspace():
             if buf:
-                result.append(buf)
-                buf = ""
+                result.append("".join(buf))
+                buf = []
             i += 1
+
             if cmd == "echo":
-                buf += " "
+                buf.append(" ")
+
             while i < len(s) and s[i].isspace():
                 i += 1
             continue
 
-        buf += c
+        buf.append(c)
         i += 1
 
     if buf:
-        result.append(buf)
+        result.append("".join(buf))
 
     return result
 
