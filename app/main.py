@@ -23,6 +23,10 @@ def tokenize_string(s, cmd):
                         buf.append(c)
                         i += 1
                         continue
+            elif in_single_quotes:
+                buf.append(c)
+                i += 1
+                continue
 
             if i + 1 < len(s):
                 buf.append(s[i + 1])
