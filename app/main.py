@@ -3,7 +3,7 @@ import os
 import subprocess
 
 
-def tokenize_string(s, cmd):
+def tokenize_string(s, cmd="echo"):
     in_single_quotes = False
     in_double_quotes = False
     i = 0
@@ -120,7 +120,7 @@ def cd(directory):
 
 
 def run_command(command):
-    command = command.split()
+    command = tokenize_string(command)
     executable = find_executable(command[0])
     if executable:
         process = subprocess.Popen(command, stdout=subprocess.PIPE)
