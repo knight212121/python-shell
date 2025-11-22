@@ -23,13 +23,8 @@ def tokenize_string(s, cmd):
                         buf.append(c)
                         i += 1
                         continue
-            elif not in_double_quotes:
-                if i + 1 < len(s):
-                    buf.append(s[i + 1])
-                    i += 1
-                    continue
 
-            buf.append(c)
+            buf.append(s[i])
             i += 1
             continue
 
