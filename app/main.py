@@ -122,29 +122,42 @@ def run_command(command):
     executable = find_executable(command[0])
     redirect_output = False
     redirect_file = ""
+    redirect_type = "stdout"
 
+    original_command = command.copy()
     if ">" in command or "1>" in command or "2>" in command:
-        redirect_file = command[-1]
-        redirect_output = True
-        command = command[:-2]
+        for i, arg in enumerate(command):
+            if arg in [">", "1>", "2>"] and i + 1 < len(command):
+                redirect_file = command[i + 1]
+                redirect_type = "stderr" if arg == "2>" else "stdout"
+                redirect_output = True
+                command = command[:i]
+                break
 
     if commands.get(command[0]) and not redirect_output:
         commands[command[0]](command[1:] if command[1:] else "")
         return
 
     if executable:
+        cmd_str = " ".join(original_command)
         process = subprocess.run(
-            command,
+            cmd_str,
+            shell=True,
             stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
+            stderr=subprocess.PIPE,
             text=True,
         )
-        for line in process.stdout or []:
-            if redirect_output:
-                with open(redirect_file, "a", encoding="utf-8") as f:
-                    f.write(line)
-            else:
-                print(line, end="")
+
+        if process.stdout:
+            print(process.stdout, end="")
+
+        output = process.stderr if redirect_type == "stderr" else process.stdout
+
+        if redirect_output:
+            with open(redirect_file, "a", encoding="utf-8") as f:
+                f.write(output)
+        elif output:
+            print(output, end="")
         return
 
     print(f"{command[0]}: command not found")
