@@ -66,8 +66,7 @@ def tokenize_string(s, cmd="cat"):
 
 
 def echo(string):
-    tokens = tokenize_string(string, "echo")
-    for i in tokens:
+    for i in string:
         print(i, end="")
     print()
 
@@ -91,7 +90,7 @@ def find_executable(executable):
 
 
 def type_of(command):
-    if command in shell_builtins:
+    if command in commands:
         print(f"{command} is a shell builtin")
         return
 
@@ -120,7 +119,6 @@ def cd(directory):
 
 
 def run_command(command):
-    command = tokenize_string(command)
     executable = find_executable(command[0])
     redirect_output = False
     redirect_file = ""
@@ -129,6 +127,9 @@ def run_command(command):
         redirect_file = command[-1]
         redirect_output = True
         command = command[:-2]
+
+    if commands.get(command[0]) and not redirect_file:
+        commands[command[0]](command[1:])
 
     if executable:
         process = subprocess.Popen(command, stdout=subprocess.PIPE)
@@ -144,52 +145,21 @@ def run_command(command):
     print(f"{command[0]}: command not found")
 
 
-def cat(command):
-    executable = find_executable("cat")
-    args = tokenize_string(command, "cat")
-    command = ["cat"]
-    command.extend(args)
-    if executable:
-        process = subprocess.Popen(command, stdout=subprocess.PIPE)
-        process.wait()
-        for line in process.stdout or []:
-            print(line.decode("utf-8"), end="")
-        return
-
-
 commands = {
     "echo": echo,
     "exit": exit_shell,
     "type": type_of,
     "pwd": pwd,
     "cd": cd,
-    "cat": cat,
 }
-
-shell_builtins = {"echo", "exit", "type", "pwd", "cd"}
 
 
 def main():
     while True:
         sys.stdout.write("$ ")
         command = input()
-        # if command[:4] == "echo":
-        #     commands[command[:4]](command[5:])
-        # elif command[:4] == "exit":
-        #     commands[command[:4]](int(command[5]))
-        # elif command[:4] == "type":
-        #     commands[command[:4]](command[5:])
-        # elif command[:3] == "pwd":
-        #     commands[command[:3]]()
-        # else:
-        #     run_command(command)
-        cmd, *args = command.split(maxsplit=1)
-        handler = commands.get(cmd)
-
-        if handler:
-            handler(args[0] if args else "")
-        else:
-            run_command(command)
+        cmd = tokenize_string(command)
+        run_command(cmd)
 
 
 if __name__ == "__main__":
