@@ -105,6 +105,7 @@ def pwd(_):
 
 
 def cd(directory):
+    directory = directory[0]
     if directory[0] == "~":
         directory = directory.replace("~", os.getenv("HOME"))
     normalized = os.path.normpath(directory)
