@@ -3,7 +3,7 @@ import os
 import subprocess
 
 
-def tokenize_string(s, cmd="cat"):
+def tokenize_string(s):
     in_single_quotes = False
     in_double_quotes = False
     i = 0
@@ -49,8 +49,8 @@ def tokenize_string(s, cmd="cat"):
                 buf = []
             i += 1
 
-            if cmd == "echo":
-                buf.append(" ")
+            # if cmd == "echo":
+            #     buf.append(" ")
 
             while i < len(s) and s[i].isspace():
                 i += 1
@@ -66,9 +66,7 @@ def tokenize_string(s, cmd="cat"):
 
 
 def echo(string):
-    for i in string:
-        print(i, end="")
-    print()
+    print(" ".join(string))
 
 
 def exit_shell(code):
