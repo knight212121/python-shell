@@ -128,19 +128,23 @@ def run_command(command):
         redirect_output = True
         command = command[:-2]
 
-    if commands.get(command[0]) and not redirect_file:
+    if commands.get(command[0]) and not redirect_output:
         commands[command[0]](command[1:] if command[1:] else "")
         return
 
     if executable:
-        process = subprocess.Popen(command, stdout=subprocess.PIPE)
-        process.wait()
+        process = subprocess.run(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
         for line in process.stdout or []:
             if redirect_output:
                 with open(redirect_file, "a", encoding="utf-8") as f:
-                    f.write(line.decode("utf-8"))
+                    f.write(line)
             else:
-                print(line.decode("utf-8"), end="")
+                print(line, end="")
         return
 
     print(f"{command[0]}: command not found")
