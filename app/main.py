@@ -130,6 +130,7 @@ def run_command(command):
 
     if commands.get(command[0]) and not redirect_file:
         commands[command[0]](command[1:])
+        return
 
     if executable:
         process = subprocess.Popen(command, stdout=subprocess.PIPE)
