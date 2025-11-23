@@ -151,13 +151,6 @@ def run_command(command):
         if process.stdout:
             print(process.stdout, end="")
 
-        output = process.stderr if redirect_type == "stderr" else process.stdout
-
-        if redirect_output:
-            with open(redirect_file, "a", encoding="utf-8") as f:
-                f.write(output)
-        elif output:
-            print(output, end="")
         return
 
     print(f"{command[0]}: command not found")
