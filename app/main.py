@@ -123,7 +123,7 @@ def run_command(command):
     redirect_output = False
     redirect_file = ""
 
-    if ">" in command or "1>" in command or "2>":
+    if ">" in command or "1>" in command or "2>" in command:
         redirect_file = command[-1]
         redirect_output = True
         command = command[:-2]
