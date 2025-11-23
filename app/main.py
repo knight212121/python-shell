@@ -150,7 +150,7 @@ def run_command(command):
             with open(redirect_file, "a", encoding="utf-8") as f:
                 if output:
                     f.write(output)
-            if process.stdout:
+            if process.stdout and redirect_type == "stderr":
                 print(process.stdout, end="")
         else:
             if process.stdout:
