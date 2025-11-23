@@ -124,7 +124,6 @@ def run_command(command):
     redirect_file = ""
     redirect_type = "stdout"
 
-    original_command = command.copy()
     if ">" in command or "1>" in command or "2>" in command:
         for i, arg in enumerate(command):
             if arg in [">", "1>", "2>"] and i + 1 < len(command):
@@ -139,18 +138,25 @@ def run_command(command):
         return
 
     if executable:
-        cmd_str = " ".join(original_command)
         process = subprocess.run(
-            cmd_str,
-            shell=True,
+            command,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stderr=subprocess.PIPE if redirect_type == "stderr" else subprocess.DEVNULL,
             text=True,
         )
 
-        if process.stdout:
-            print(process.stdout, end="")
-
+        if redirect_output:
+            output = process.stderr if redirect_type == "stderr" else process.stdout
+            with open(redirect_file, "a", encoding="utf-8") as f:
+                if output:
+                    f.write(output)
+            if process.stdout:
+                print(process.stdout, end="")
+        else:
+            if process.stdout:
+                print(process.stdout, end="")
+            elif process.stderr and redirect_type == "stderr":
+                print(process.stderr, end="")
         return
 
     print(f"{command[0]}: command not found")
