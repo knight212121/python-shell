@@ -88,6 +88,7 @@ def find_executable(executable):
 
 
 def type_of(command):
+    command = command[0]
     if command in commands:
         print(f"{command} is a shell builtin")
         return
@@ -128,7 +129,7 @@ def run_command(command):
         command = command[:-2]
 
     if commands.get(command[0]) and not redirect_file:
-        commands[command[0]](command[1:])
+        commands[command[0]](command[1:] if command[1:] else "")
         return
 
     if executable:
