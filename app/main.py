@@ -151,6 +151,8 @@ def run_command(command):
                     f.write(output)
             if process.stdout and redirect_type == "stderr":
                 print(process.stdout, end="")
+            if process.stderr and redirect_type == "stdout":
+                print(process.stderr, end="")
         else:
             if process.stdout:
                 print(process.stdout, end="")
