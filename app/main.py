@@ -1,9 +1,9 @@
 import sys
+import tty
+import termios
 import os
 import subprocess
 import readline
-from pynput.keyboard import Key
-from pynput import keyboard
 
 
 class Tokenizer:
@@ -304,41 +304,32 @@ class AutoCompleter:
 
     def __init__(self, builtins):
         self.builtins = builtins
-        self.setup_readline()
+        self.last_prefix = None
+        self.matches = []
+        self.index = 0
 
-    def setup_readline(self):
-        """Initialize readline with tab completion"""
-        readline.set_completer(self.autocomplete)
-        readline.parse_and_bind("tab: complete")
+    def autocomplete(self, buffer):
+        parts = buffer.split()
+        if not parts:
+            prefix = ""
+        else:
+            prefix = parts[-1]
 
-    def autocomplete(self, text, state):
-        """Auto-completion function for readline"""
-        matches = [cmd for cmd in self.builtins.commands.keys() if cmd.startswith(text)]
-        try:
-            if state < len(matches):
-                return matches[state]
-        except IndexError:
-            return None
-        return None
+        if prefix != self.last_prefix:
+            self.last_prefix = prefix
+            self.matches = [
+                cmd for cmd in self.builtins.commands.keys() if cmd.startswith(prefix)
+            ]
+            self.index = 0
 
+        if not self.matches:
+            return buffer
 
-class KeyboardHandler:
-    """Handles keyboard input and special keys"""
+        match = self.matches[self.index]
+        self.index = (self.index + 1) % len(self.matches)
 
-    def __init__(self, completer):
-        self.completer = completer
-
-    def key_press(self, key):
-        """Handle key press events"""
-        if key == Key.tab:
-            # Tab completion is handled by readline
-            pass
-
-    def start_listener(self):
-        """Start the keyboard listener"""
-        listener = keyboard.Listener(on_press=self.key_press)
-        listener.start()
-        return listener
+        new_buffer = " ".join(parts[:-1] + [match])
+        return new_buffer
 
 
 class Shell:
@@ -350,35 +341,80 @@ class Shell:
         self.builtins = BuiltinCommands(self)
         self.executor = CommandExecutor(self.builtins, self.path_resolver)
         self.completer = AutoCompleter(self.builtins)
-        self.keyboard_handler = KeyboardHandler(self.completer)
+
+    def enter_raw_mode(self):
+        self.fd = sys.stdin.fileno()
+        self.old_settings = termios.tcgetattr(self.fd)
+        tty.setraw(self.fd)
+
+    def exit_raw_mode(self):
+        termios.tcsetattr(self.fd, termios.TCSADRAIN, self.old_settings)
+
+    def redraw_prompt(self, buffer):
+        sys.stdout.write("\r")
+        sys.stdout.write("\x1b[k")
+        sys.stdout.write("\r$ " + buffer)
+        sys.stdout.flush()
+
+    def read_line(self):
+        buffer = ""
+        self.enter_raw_mode()
+
+        try:
+            while True:
+                sys.stdout.write("\r$ " + buffer)
+                sys.stdout.write("\x1b[K")
+                sys.stdout.flush()
+                ch = sys.stdin.read(1)
+
+                if ch == "\n" or ch == "\r":
+                    sys.stdout.write("\r\n")
+                    break
+
+                elif ch == "\t":
+                    buffer = self.completer.autocomplete(buffer)
+
+                elif ch == "\x7f":  # Backspace
+                    if len(buffer) > 0:
+                        buffer = buffer[:-1]
+
+                elif ch == "\x03":  # Ctrl C
+                    sys.stdout.write("^C\r\n")
+                    raise KeyboardInterrupt
+
+                elif ch == "\x04":  # Ctrl D
+                    if buffer == "":
+                        sys.stdout.write("\r\n")
+                        raise EOFError
+
+                else:
+                    buffer += ch
+                    self.redraw_prompt(buffer)
+        finally:
+            self.exit_raw_mode()
+
+        return buffer
 
     def run(self):
         """Main shell execution loop"""
 
-        # Start keyboard listener
-        listener = self.keyboard_handler.start_listener()
+        while True:
+            try:
+                command_input = self.read_line()
 
-        try:
-            while True:
-                try:
-                    sys.stdout.write("$ ")
-                    command_input = input().strip()
+                if not command_input:
+                    continue
 
-                    if not command_input:
-                        continue
+                # Tokenize and execute command
+                tokens = self.tokenizer.tokenize_string(command_input)
+                self.executor.run_command(tokens)
 
-                    # Tokenize and execute command
-                    tokens = self.tokenizer.tokenize_string(command_input)
-                    self.executor.run_command(tokens)
-
-                except EOFError:
-                    print("\nUse 'exit' to quit the shell")
-                except KeyboardInterrupt:
-                    print("\nUse 'exit' to quit the shell")
-
-        finally:
-            # Stop the keyboard listener
-            listener.stop()
+            except EOFError:
+                print("Use exit")
+                continue
+            except KeyboardInterrupt:
+                print("Ctrl C")
+                continue
 
 
 def main():
