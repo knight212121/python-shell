@@ -141,7 +141,7 @@ def run_command(command):
         process = subprocess.run(
             command,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE if redirect_type == "stderr" else subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
             text=True,
         )
 
@@ -152,10 +152,12 @@ def run_command(command):
                     f.write(output)
             if process.stdout and redirect_type == "stderr":
                 print(process.stdout, end="")
+            if process.stderr:
+                print(process.stderr, end="")
         else:
             if process.stdout:
                 print(process.stdout, end="")
-            elif process.stderr and redirect_type == "stderr":
+            if process.stderr:
                 print(process.stderr, end="")
         return
 
