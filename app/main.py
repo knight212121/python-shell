@@ -3,7 +3,6 @@ import tty
 import termios
 import os
 import subprocess
-import readline
 
 
 class Tokenizer:
@@ -329,7 +328,7 @@ class AutoCompleter:
         self.index = (self.index + 1) % len(self.matches)
 
         new_buffer = " ".join(parts[:-1] + [match])
-        return new_buffer
+        return new_buffer + " "
 
 
 class Shell:
