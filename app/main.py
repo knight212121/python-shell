@@ -124,14 +124,13 @@ def run_command(command):
     redirect_file = ""
     redirect_type = "stdout"
 
-    if ">" in command or "1>" in command or "2>" in command:
-        for i, arg in enumerate(command):
-            if arg in [">", "1>", "2>"] and i + 1 < len(command):
-                redirect_file = command[i + 1]
-                redirect_type = "stderr" if arg == "2>" else "stdout"
-                redirect_output = True
-                command = command[:i]
-                break
+    for i, arg in enumerate(command):
+        if arg in [">", "1>", "2>", ">>", "1>>"] and i + 1 < len(command):
+            redirect_file = command[i + 1]
+            redirect_type = "stderr" if arg == "2>" else "stdout"
+            redirect_output = True
+            command = command[:i]
+            break
 
     if commands.get(command[0]) and not redirect_output:
         commands[command[0]](command[1:] if command[1:] else "")
