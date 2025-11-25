@@ -360,9 +360,9 @@ class AutoCompleter:
             new_buffer = (
                 " ".join(parts[:-1] + [common_prefix]) if parts else common_prefix
             )
-            return new_buffer + " ", True
+            return new_buffer, True
         else:
-            return buffer + " ", True
+            return buffer, True
 
     def reset_tab_complete(self):
         self.tab_complete = False
