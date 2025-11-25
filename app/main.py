@@ -305,6 +305,23 @@ class AutoCompleter:
         self.last_prefix = None
         self.matches = []
         self.index = 0
+        self.executables = list(self.builtins.commands.keys())
+        if "PATH" not in os.environ:
+            return ""
+
+        path_dirs = os.environ["PATH"].split(os.pathsep)
+        for path in path_dirs:
+            if os.path.exists(path):
+                try:
+                    for entry in os.listdir(path):
+                        file_path = os.path.join(path, entry)
+                        if os.access(file_path, os.X_OK):
+                            exec = file_path.split("/")
+                            self.executables.append(exec[-1])
+                except OSError:
+                    continue
+
+
 
     def autocomplete(self, buffer):
         parts = buffer.split()
@@ -316,7 +333,7 @@ class AutoCompleter:
         if prefix != self.last_prefix:
             self.last_prefix = prefix
             self.matches = [
-                cmd for cmd in self.builtins.commands.keys() if cmd.startswith(prefix)
+                cmd for cmd in self.executables if cmd.startswith(prefix)
             ]
             self.index = 0
 
