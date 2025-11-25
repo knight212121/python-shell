@@ -338,7 +338,7 @@ class AutoCompleter:
 
         if len(self.matches) == 1:
             match = self.matches[0]
-            new_buffer = " ".join(parts[:-1] + [match]) if parts else match
+            new_buffer = "  ".join(parts[:-1] + [match]) if parts else match
             self.tab_complete = False
             return new_buffer, False
         else:
@@ -351,7 +351,7 @@ class AutoCompleter:
             else:
                 if show_options:
                     sys.stdout.write("\r\n")
-                    sys.stdout.write(" ".join(self.matches))
+                    sys.stdout.write("  ".join(self.matches))
                     sys.stdout.write("\r\n")
                     self.tab_complete = False
 
