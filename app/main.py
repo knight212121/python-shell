@@ -305,7 +305,8 @@ class AutoCompleter:
         self.last_prefix = None
         self.matches = []
         self.index = 0
-        self.executables = list(self.builtins.commands.keys())
+        self.executables = set(self.builtins.commands.keys())
+        self.tab_complete = False
         if "PATH" not in os.environ:
             return ""
 
@@ -317,34 +318,54 @@ class AutoCompleter:
                         file_path = os.path.join(path, entry)
                         if os.access(file_path, os.X_OK):
                             exec = file_path.split("/")
-                            self.executables.append(exec[-1])
+                            self.executables.add(exec[-1])
                 except OSError:
                     continue
 
-
-
-    def autocomplete(self, buffer):
+    def autocomplete(self, buffer, show_options):
         parts = buffer.split()
         if not parts:
             prefix = ""
         else:
             prefix = parts[-1]
 
-        if prefix != self.last_prefix:
-            self.last_prefix = prefix
-            self.matches = [
-                cmd for cmd in self.executables if cmd.startswith(prefix)
-            ]
-            self.index = 0
+        self.matches = sorted(cmd for cmd in self.executables if cmd.startswith(prefix))
 
         if not self.matches:
-            return buffer + "\x07"
+            sys.stdout.write("\x07")
+            sys.stdout.flush()
+            return buffer, False
 
-        match = self.matches[self.index]
-        self.index = (self.index + 1) % len(self.matches)
+        if len(self.matches) == 1:
+            match = self.matches[0]
+            new_buffer = " ".join(parts[:-1] + [match]) if parts else match
+            self.tab_complete = False
+            return new_buffer, False
+        else:
+            if not self.tab_complete:
+                self.tab_complete = True
+                sys.stdout.write("\x07")
+                sys.stdout.flush()
+                self.tab_complete = True
+                return buffer, True
+            else:
+                if show_options:
+                    sys.stdout.write("\r\n")
+                    sys.stdout.write(" ".join(self.matches))
+                    sys.stdout.write("\r\n")
+                    self.tab_complete = False
 
-        new_buffer = " ".join(parts[:-1] + [match])
-        return new_buffer + " "
+        common_prefix = os.path.commonprefix(self.matches)
+        if common_prefix and common_prefix != prefix:
+            new_buffer = (
+                " ".join(parts[:-1] + [common_prefix]) if parts else common_prefix
+            )
+            return new_buffer, True
+        else:
+            return buffer, True
+
+    def reset_tab_complete(self):
+        self.tab_complete = False
 
 
 class Shell:
@@ -384,10 +405,16 @@ class Shell:
 
                 if ch == "\n" or ch == "\r":
                     sys.stdout.write("\r\n")
+                    self.completer.reset_tab_complete()
                     break
 
                 elif ch == "\t":
-                    buffer = self.completer.autocomplete(buffer)
+                    new_buffer, has_matches = self.completer.autocomplete(
+                        buffer, show_options=True
+                    )
+                    if new_buffer != buffer:
+                        buffer = new_buffer
+                    self.redraw_prompt(buffer)
 
                 elif ch == "\x7f":  # Backspace
                     if len(buffer) > 0:
