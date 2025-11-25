@@ -113,7 +113,7 @@ class BuiltinCommands:
 
         print(f"{command}: not found")
 
-    def pwd(self, args):
+    def pwd(self, _):
         """Print current working directory"""
         print(os.getcwd())
 
@@ -221,7 +221,6 @@ class CommandExecutor:
         """Execute command with output redirection"""
         if self.builtins.is_builtin(command):
             # For builtins, we need to capture their output
-            import io
             from contextlib import redirect_stdout, redirect_stderr
 
             mode = "a" if append_mode else "w"
@@ -322,7 +321,7 @@ class AutoCompleter:
             self.index = 0
 
         if not self.matches:
-            return buffer
+            return buffer + "\x07"
 
         match = self.matches[self.index]
         self.index = (self.index + 1) % len(self.matches)
